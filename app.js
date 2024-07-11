@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
 const connection = require('./db');
@@ -157,19 +158,20 @@ app.post('/api/certidoes', isAuthenticated, (req, res) => {
 });
 
 // Atualizar uma certidão existente
-app.put('/api/certidoes/:id', isAuthenticated, (req, res) => {
-    const { id } = req.params;
-    const { numeroMatricula, numeroPedido, dataPedido, tipoCertidao, temProtocolo, protocolos } = req.body;
-    const userId = req.session.user.id;
-
-    const query = 'UPDATE certidoes SET numero_matricula = ?, numero_pedido = ?, data_pedido = ?, tipo_certidao = ?, tem_protocolo = ?, protocolos = ? WHERE id = ? AND user_id = ?';
-    const params = [numeroMatricula, numeroPedido, dataPedido, tipoCertidao, temProtocolo === 'sim' ? 'sim' : 'não', JSON.stringify(protocolos), id, userId];
-
-    connection.query(query, params, (err, results) => {
+app.get('/api/certidoes/:id', isAuthenticated, (req, res) => {
+    const certidaoId = req.params.id;
+    const query = 'SELECT * FROM certidoes WHERE id = ? AND user_id = ?';
+    connection.query(query, [certidaoId, req.session.user.id], (err, results) => {
         if (err) throw err;
-        res.json({ success: true });
+        if (results.length === 0) {
+            return res.status(404).json({ success: false, message: 'Certidão não encontrada' });
+        }
+        const certidao = results[0];
+        certidao.protocolos = JSON.parse(certidao.protocolos);
+        res.json(certidao);
     });
 });
+
 
 // Deletar uma certidão
 app.delete('/api/certidoes/:id', isAuthenticated, (req, res) => {
@@ -180,6 +182,23 @@ app.delete('/api/certidoes/:id', isAuthenticated, (req, res) => {
         if (err) throw err;
         res.json({ success: true });
     });
+});
+
+// Servir arquivos estáticos e rotas HTML
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/certidoes.html', isAuthenticated, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'certidoes.html'));
+});
+
+app.get('/emitir.html', isAuthenticated, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'emitir.html'));
+});
+
+app.get('/home.html', isAuthenticated, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'home.html'));
 });
 
 app.listen(3000, () => {

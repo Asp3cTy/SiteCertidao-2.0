@@ -5,7 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const submitButton = document.getElementById('submitButton');
     const toggleDarkModeButton = document.getElementById('toggleDarkMode');
     const addProtocoloButton = document.getElementById('addProtocoloButton');
+    const confirmarCertidaoButton = document.getElementById('confirmarCertidaoButton');
     const filterButton = document.getElementById('applyFilterButton');
+    const logoutButton = document.getElementById('logoutButton');
+    const userGreeting = document.getElementById('userGreeting');
     let certidoesChart;
     let chart;
     let protocolos = [];
@@ -23,6 +26,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     setTodayDate();
+
+    if (logoutButton) {
+        logoutButton.addEventListener('click', () => {
+            fetch('/api/logout', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = '/';
+                    } else {
+                        alert('Erro ao fazer logout');
+                    }
+                });
+        });
+    }
 
     // Inicializar o gráfico de certidões se ele existir na página
     if (document.getElementById('certidoesChart')) {
@@ -89,6 +106,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 protocolos = [];
             }
         });
+
+        // Garantir que o estado de "Tem Protocolo" não seja alterado ao fechar o modal
+        $('#protocoloModal').on('hidden.bs.modal', () => {
+            if (protocolos.length > 0) {
+                temProtocolo.value = 'sim';
+            } else {
+                temProtocolo.value = 'não';
+            }
+        });
     }
 
     if (addProtocoloButton) {
@@ -102,7 +128,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('numeroProtocolo').value = '';
                 document.getElementById('dadosProtocolo').value = '';
                 document.getElementById('dataProtocolo').value = '';
+                temProtocolo.value = 'sim';
             }
+        });
+    }
+
+    if (confirmarCertidaoButton) {
+        confirmarCertidaoButton.addEventListener('click', () => {
+            const numeroMatricula = document.getElementById('numeroMatricula').value;
+            const numeroPedido = document.getElementById('numeroPedido').value;
+            const dataPedido = document.getElementById('dataPedido').value;
+            const tipoCertidao = document.getElementById('tipoCertidao').value;
+            const temProtocoloValue = temProtocolo.value;
+
+            addCertidao(numeroMatricula, numeroPedido, dataPedido, tipoCertidao, temProtocoloValue, protocolos);
+
+            form.reset();
+            setTodayDate();  // Atualiza a data para a data atual após resetar o formulário
+            protocolos = [];
+            editIndexInput.value = '';
+            submitButton.textContent = 'Adicionar Certidão';
+            alert('Certidão salva com sucesso!');
+            $('#protocoloModal').modal('hide'); // Fechar o modal após confirmar a certidão
         });
     }
 
@@ -142,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                fetchCertidoes();
+                alert('Certidão adicionada com sucesso!');
             } else {
                 alert('Erro ao adicionar certidão');
             }
@@ -160,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                fetchCertidoes();
+                alert('Certidão atualizada com sucesso!');
             } else {
                 alert('Erro ao atualizar certidão');
             }
@@ -214,12 +261,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${certidao.numero_pedido}</td>
                 <td>${new Date(certidao.data_pedido).toLocaleDateString()}</td>
                 <td>${certidao.tipo_certidao}</td>
+                <td>${Array.isArray(certidao.protocolos) && certidao.protocolos.length > 0 ? '<button class="btn btn-info btn-sm" onclick="viewProtocolo(' + certidao.id + ')">Ver Protocolos</button>' : 'Não'}</td>
                 <td>
-                    ${certidao.tem_protocolo === 'sim' && certidao.protocolos.length > 0 ? 
-                    `<button class="btn btn-info btn-sm btn-custom" onclick="showProtocolos(${certidao.id})">Protocolos</button>` : 'Não'}
-                </td>
-                <td>
-                    <button class="btn btn-danger btn-sm btn-custom" onclick="deleteCertidao(${certidao.id})">Excluir</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteCertidao(${certidao.id})">Excluir</button>
                 </td>
             </tr>
         `).join('');
@@ -262,20 +306,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    window.showProtocolos = function(id) {
+    window.viewProtocolo = function(id) {
         fetch(`/api/certidoes/${id}`)
             .then(response => response.json())
             .then(certidao => {
-                const protocolos = JSON.parse(certidao.protocolos || '[]');
+                let protocolos = certidao.protocolos;
+                if (typeof protocolos === 'string') {
+                    protocolos = JSON.parse(certidao.protocolos || '[]');
+                }
                 const modalBody = document.getElementById('modalBody');
                 modalBody.innerHTML = protocolos.map((protocolo, i) => `
                     <div>
                         <strong>Protocolo ${i + 1}:</strong><br>
-                        Número: ${protocolo.numeroProtocolo}, Dados: ${protocolo.dadosProtocolo}, Data: ${protocolo.dataProtocolo}
+                        Número: ${protocolo.numeroProtocolo}, Dados: ${protocolo.dadosProtocolo}, Data: ${new Date(protocolo.dataProtocolo).toLocaleDateString()}
                     </div>
                 `).join('');
                 $('#protocoloModal').modal('show');
-            });
+            })
+            .catch(error => console.error('Erro ao carregar protocolos:', error));
     };
 
     window.deleteCertidao = function(id) {
