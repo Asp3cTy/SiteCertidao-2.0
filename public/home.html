@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Site</a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="emitir.html">Emitir Certidão</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="certidoes.html">Certidões Emitidas</a>
+                </li>
+            </ul>
+            <span id="userGreeting" class="navbar-text mr-3"></span>
+            <button id="logoutButton" class="btn btn-outline-danger">Logout</button>
+            <button id="toggleDarkMode" class="btn btn-secondary ml-2">Modo Noturno</button>
+        </div>
+    </nav>
+    <div class="container mt-4">
+        <h1 class="text-center">Bem-vindo ao Sistema de Certidões</h1>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

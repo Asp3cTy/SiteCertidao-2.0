@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emitir Certidão</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Site</a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="home.html">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="certidoes.html">Certidões Emitidas</a>
+                </li>
+            </ul>
+            <button id="toggleDarkMode" class="btn btn-secondary ml-auto">Modo Noturno</button>
+        </div>
+    </nav>
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Emitir Nova Certidão</h1>
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <form id="certidaoForm">
+                    <input type="hidden" id="editIndex" value="">
+                    <div class="form-group">
+                        <label for="numeroMatricula">Número de Matrícula</label>
+                        <input type="text" class="form-control" id="numeroMatricula" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="numeroPedido">Número do Pedido</label>
+                        <input type="text" class="form-control" id="numeroPedido" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dataPedido">Data do Pedido</label>
+                        <input type="date" class="form-control" id="dataPedido" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="tipoCertidao">Tipo de Certidão</label>
+                        <select class="form-control" id="tipoCertidao" required>
+                            <option value="BALCAO">BALCÃO</option>
+                            <option value="ARIRJ">ARIRJ</option>
+                            <option value="E-CARTORIO">E-CARTÓRIO</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="temProtocolo">Tem Protocolo?</label>
+                        <select class="form-control" id="temProtocolo" required>
+                            <option value="nao">Não</option>
+                            <option value="sim">Sim</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-3" id="submitButton">Adicionar Certidão</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para adicionar protocolo -->
+    <div class="modal fade" id="protocoloModal" tabindex="-1" role="dialog" aria-labelledby="protocoloModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="protocoloModalLabel">Adicionar Protocolo</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="numeroProtocolo">Número do Protocolo</label>
+                        <input type="text" class="form-control" id="numeroProtocolo">
+                    </div>
+                    <div class="form-group">
+                        <label for="dadosProtocolo">Dados do Protocolo</label>
+                        <input type="text" class="form-control" id="dadosProtocolo">
+                    </div>
+                    <div class="form-group">
+                        <label for="dataProtocolo">Data do Protocolo</label>
+                        <input type="date" class="form-control" id="dataProtocolo">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" id="addProtocoloButton">Adicionar Protocolo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+body.dark-mode {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+.navbar.dark-mode {
+    background-color: #1c1c1c;
+}
+
+.form-control.dark-mode,
+.table.dark-mode,
+.modal-content.dark-mode {
+    background-color: #1c1c1c;
+    color: #ffffff;
+}
+
+.btn-custom {
+    margin-right: 5px;
+}
