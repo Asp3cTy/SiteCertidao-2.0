@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const numeroPedido = document.getElementById('numeroPedido').value;
             const dataPedido = document.getElementById('dataPedido').value;
             const tipoCertidao = document.getElementById('tipoCertidao').value;
-            const temProtocoloValue = temProtocolo.value;
+            const temProtocoloValue = protocolos.length > 0 ? 'sim' : 'não';
             const editIndex = editIndexInput.value;
 
             if (editIndex) {
@@ -189,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Certidão adicionada com sucesso!');
+                fetchCertidoes();
             } else {
                 alert('Erro ao adicionar certidão');
             }
@@ -207,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Certidão atualizada com sucesso!');
+                fetchCertidoes();
             } else {
                 alert('Erro ao atualizar certidão');
             }
@@ -240,11 +240,12 @@ document.addEventListener('DOMContentLoaded', () => {
         fetch(url)
             .then(response => response.json())
             .then(certidoes => {
-                filteredCertidoes = certidoes;
+                filteredCertidoes = certidoes || [];
                 currentPage = 1;
                 renderCertidoes();
                 updateChart();
-            });
+            })
+            .catch(error => console.error('Erro ao aplicar filtros:', error));
     }
 
     function renderCertidoes() {
@@ -261,9 +262,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${certidao.numero_pedido}</td>
                 <td>${new Date(certidao.data_pedido).toLocaleDateString()}</td>
                 <td>${certidao.tipo_certidao}</td>
-                <td>${Array.isArray(certidao.protocolos) && certidao.protocolos.length > 0 ? '<button class="btn btn-info btn-sm" onclick="viewProtocolo(' + certidao.id + ')">Ver Protocolos</button>' : 'Não'}</td>
                 <td>
-                    <button class="btn btn-danger btn-sm" onclick="deleteCertidao(${certidao.id})">Excluir</button>
+                    ${Array.isArray(JSON.parse(certidao.protocolos)) && JSON.parse(certidao.protocolos).length > 0 ? 
+                    `<button class="btn btn-info btn-sm btn-custom" onclick="viewProtocolo(${certidao.id})">Protocolos</button>` : 'Não'}
+                </td>
+                <td>
+                    <button class="btn btn-danger btn-sm btn-custom" onclick="deleteCertidao(${certidao.id})">Excluir</button>
                 </td>
             </tr>
         `).join('');
@@ -316,9 +320,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 const modalBody = document.getElementById('modalBody');
                 modalBody.innerHTML = protocolos.map((protocolo, i) => `
-                    <div>
+                    <div class="protocolo-box mb-3 p-3 border rounded">
                         <strong>Protocolo ${i + 1}:</strong><br>
-                        Número: ${protocolo.numeroProtocolo}, Dados: ${protocolo.dadosProtocolo}, Data: ${new Date(protocolo.dataProtocolo).toLocaleDateString()}
+                        <strong>Número:</strong> ${protocolo.numeroProtocolo}<br>
+                        <strong>Dados:</strong> ${protocolo.dadosProtocolo}<br>
+                        <strong>Data:</strong> ${new Date(protocolo.dataProtocolo).toLocaleDateString()}
                     </div>
                 `).join('');
                 $('#protocoloModal').modal('show');

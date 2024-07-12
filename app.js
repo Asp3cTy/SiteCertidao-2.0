@@ -172,7 +172,6 @@ app.get('/api/certidoes/:id', isAuthenticated, (req, res) => {
     });
 });
 
-
 // Deletar uma certidão
 app.delete('/api/certidoes/:id', isAuthenticated, (req, res) => {
     const certidaoId = req.params.id;
